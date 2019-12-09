@@ -1,61 +1,91 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-    <h1>Vue.js SPA</h1>
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-content>
-      <HelloWorld/>
-    </v-content>
+    <div class="d-flex align-center">
+        <PostListItem v-for="(post, index) in posts" :key="index" :postData='post' :postUsers='users'> 
+        </PostListItem>
+    </div>
+    <v-spacer></v-spacer>
+    <v-content> </v-content>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
-
+import axios from 'axios'
+import PostListItem from './components/PostListItem'
 export default {
   name: 'App',
-
   components: {
-    HelloWorld,
+    PostListItem
+  },
+  data: function() {
+    return {
+      posts: null,
+      endpoint: 'https://jsonplaceholder.typicode.com/posts/'
+    }
+  },
+  users: function(){
+    return {
+      users: null,
+      endpoint: 'https://jsonplaceholder.typicode.com/users/'
+    }
+  },
+  created() {
+    this.getAllPosts()
   },
 
-  data: () => ({
-    //
-  }),
-};
+  methods: {
+    getAllPosts() {
+      axios
+        .get(this.endpoint)
+        .then(response => {
+          //debugger
+          this.posts = response.data
+          this.users = response.users
+        })
+        .catch(error => {
+          var e = error
+          return e
+          //console.log('-----error-------');
+          //console.log(error);
+        })
+    }
+  },
+  watch: {
+    $route() {
+      this.getPost(this.id)
+    }
+  }
+}
 </script>
+
+<style lang="scss">
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+.d-flex {
+  flex-direction: column !important;
+}
+h1,
+h2 {
+  font-weight: normal;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  display: block;
+  margin: 0 10px;
+}
+
+a {
+  color: #42b983;
+}
+</style>
